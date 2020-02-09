@@ -13,8 +13,9 @@ const SocketProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    socket.onopen = () => {
+    socket.onopen = (e: any) => {
       console.log("Successfully Connected");
+
       send(
         JSON.stringify({
           action: "REQUEST_VERSION_NUMBER"
@@ -23,8 +24,8 @@ const SocketProvider: React.FC = ({ children }) => {
       socket.onclose = (e: any) => {
         console.log("Socket Closed Connection: ", e);
       };
-      socket.onmessage = (response: any) => {
-        setResponse(response);
+      socket.onmessage = (e: any) => {
+        setResponse(JSON.parse(e.data));
       };
       socket.onerror = (e: any) => {
         console.log("Socket Error: ", e);

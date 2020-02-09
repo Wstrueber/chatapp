@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import { withUser } from "./context/withUser";
 
 const App = (props: any) => {
-  console.log(props);
+  // console.log(props);
   return (
     <div className="App">
       {!props.loggedIn && <Login />}

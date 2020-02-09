@@ -7,11 +7,11 @@ import UserProvider from "./context/UserProvider";
 import SocketProvider from "./context/SocketProvider";
 
 ReactDOM.render(
-  <UserProvider>
-    <SocketProvider>
+  <SocketProvider>
+    <UserProvider>
       <App />
-    </SocketProvider>
-  </UserProvider>,
+    </UserProvider>
+  </SocketProvider>,
   document.getElementById("root")
 );
 

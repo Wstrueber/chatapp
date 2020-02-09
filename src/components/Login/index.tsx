@@ -13,19 +13,24 @@ const Login = (props: any) => {
 
   const handleFormSubmit = (e: any) => {
     e.preventDefault();
-    props.send(JSON.stringify({ action: "REQUEST_LOGIN", message: value }));
+    props.send(
+      JSON.stringify({
+        action: "REQUEST_LOGIN",
+        client: { clientId: props.user.clientId, userName: value }
+      })
+    );
     setValue("");
   };
 
   useEffect(() => {
-    if (props.response && props.response.data) {
-      const res = JSON.parse(props.response.data);
-      console.log(res);
-      if (res.response && res.response.userName) {
+    if (props.response) {
+      if (props.response.userName) {
+        props.setUser({ ...props.user, userName: props.response.userName });
         props.setLoggedIn(true);
       }
     }
   }, [props.response]);
+
   return (
     <div>
       <h3>Choose a username</h3>

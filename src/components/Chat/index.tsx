@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { withSocket } from "../../context/withSocket";
+import { withUser } from "../../context/withUser";
 
 const Chat = (props: any) => {
   const [messages, setMessages] = useState<any[]>([]);
-  const [typing, setTyping] = useState<any>({ typing: false });
+  const [typing, setTyping] = useState<any>(null);
   const [value, setValue] = useState("");
   const [color] = useState(
     "#" + (((1 << 24) * Math.random()) | 0).toString(16)
   );
-  useEffect(() => {
-    if (props.response && props.response.data) {
-      const payload = JSON.parse(props.response.data);
 
-      if (payload.response && payload.response.message) {
-        setMessages([...messages, payload]);
+  useEffect(() => {
+    if (props.response) {
+      const payload = props.response;
+
+      if (payload && payload.message) {
+        setMessages([
+          ...messages,
+          { userName: payload.userName, message: payload.message }
+        ]);
       }
-      if (payload.response && payload.response.typing) {
-        console.log(payload);
+
+      if (payload && payload.userName && payload.typing) {
+        console.log(payload, "<---");
         setTyping({
           ...typing,
-          typing: payload.response.typing,
           userName: payload.userName
         });
       }
@@ -31,8 +36,17 @@ const Chat = (props: any) => {
   }, [messages]);
 
   useEffect(() => {
-    if (value && props.send) {
-      props.send(JSON.stringify({ action: "USER_TYPING" }));
+    if (value) {
+      props.send(
+        JSON.stringify({
+          action: "USER_TYPING",
+          client: {
+            clientId: props.user.clientId,
+            userName: props.user.userName
+          },
+          typing: true
+        })
+      );
       return;
     }
   }, [value]);
@@ -59,21 +73,19 @@ const Chat = (props: any) => {
         }}
       >
         {messages.length > 0 &&
-          messages.map((message: any, i: number) => {
+          messages.map((m: any, i: number) => {
             return (
               <div
                 style={{ paddingLeft: 10, paddingTop: 2, fontSize: 20 }}
                 key={i}
               >
-                <span style={{ color }}>{message.userName}: </span>
-                <span style={{ color: "black" }}>
-                  {message.response.message}
-                </span>
+                <span style={{ color }}>{m.userName}: </span>
+                <span style={{ color: "black" }}>{m.message}</span>
               </div>
             );
           })}
       </div>
-      {typing && typing.typing && (
+      {typing && typing.userName && (
         <div
           style={{ position: "absolute", bottom: 60, right: 40, fontSize: 18 }}
         >
@@ -84,10 +96,27 @@ const Chat = (props: any) => {
         onSubmit={(e: any) => {
           e.preventDefault();
           props.send(
-            JSON.stringify({ action: "REQUEST_RESPONSE", message: value })
+            JSON.stringify({
+              action: "REQUEST_RESPONSE",
+              message: value,
+              client: {
+                clientId: props.user.clientId,
+                userName: props.user.userName
+              }
+            })
           );
-          setTyping({});
+          setTyping(null);
           setValue("");
+          props.send(
+            JSON.stringify({
+              action: "USER_TYPING",
+              client: {
+                clientId: props.user.clientId,
+                userName: props.user.userName
+              },
+              typing: false
+            })
+          );
         }}
       >
         <input
@@ -110,4 +139,4 @@ const Chat = (props: any) => {
   );
 };
 
-export default withSocket(Chat);
+export default withSocket(withUser(Chat));
