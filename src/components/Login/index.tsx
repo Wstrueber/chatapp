@@ -32,7 +32,13 @@ const Login = (props: any) => {
   }, [props.response]);
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center"
+      }}
+    >
       <h3>Choose a username</h3>
       <form onSubmit={handleFormSubmit}>
         <input
@@ -42,7 +48,6 @@ const Login = (props: any) => {
           onChange={handleInputChange}
           style={{
             borderWidth: 0,
-            width: "500px",
             fontSize: 20,
             height: 40,
             marginBottom: "calc(100% - 30px)"

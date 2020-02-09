@@ -62,8 +62,8 @@ const Chat = (props: any) => {
   return (
     <div
       style={{
-        height: "800px",
-        width: "800px",
+        height: "70vh",
+        width: "70vw",
         color: "black",
         fontWeight: "bolder",
         position: "relative",
