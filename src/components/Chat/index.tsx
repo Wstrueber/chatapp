@@ -127,6 +127,7 @@ const Chat = (props: any) => {
         <input
           type="text"
           value={value}
+          placeholder="Typing something..."
           onChange={handleInputChange}
           autoFocus={true}
           style={{
