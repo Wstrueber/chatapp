@@ -1,6 +1,7 @@
 import React, { useEffect, useState, createContext } from "react";
 
 const s = new WebSocket("wss:quiet-mesa-83538.herokuapp.com/ws");
+// const s = new WebSocket("ws:localhost:8080/ws");
 
 export const { Provider, Consumer } = createContext<any>({});
 

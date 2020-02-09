@@ -15,7 +15,6 @@ const UserProvider: React.FC = (props: any) => {
         props.response.clientId &&
         !props.response.userName
       ) {
-        console.log(user, "user");
         setUser({ ...user, clientId: props.response.clientId });
       }
     }

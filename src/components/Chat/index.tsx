@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { withSocket } from "../../context/withSocket";
 import { withUser } from "../../context/withUser";
+import { useRef } from "react";
 
 const Chat = (props: any) => {
   const [messages, setMessages] = useState<any[]>([]);
@@ -10,23 +11,27 @@ const Chat = (props: any) => {
     "#" + (((1 << 24) * Math.random()) | 0).toString(16)
   );
 
+  const handleTyping = (payload: any) => {
+    setTyping({
+      typing: payload.typing,
+      userName: payload.userName
+    });
+  };
+
   useEffect(() => {
     if (props.response) {
       const payload = props.response;
 
       if (payload && payload.message) {
+        console.log(payload);
         setMessages([
           ...messages,
           { userName: payload.userName, message: payload.message }
         ]);
       }
-
-      if (payload && payload.userName && payload.typing) {
-        console.log(payload, "<---");
-        setTyping({
-          ...typing,
-          userName: payload.userName
-        });
+      console.log(payload.typing, "<---");
+      if (payload && payload.userName) {
+        handleTyping(payload);
       }
     }
   }, [props.response]);
@@ -79,13 +84,13 @@ const Chat = (props: any) => {
                 style={{ paddingLeft: 10, paddingTop: 2, fontSize: 20 }}
                 key={i}
               >
-                <span style={{ color }}>{m.userName}: </span>
+                {m.userName && <span style={{ color }}>{m.userName}: </span>}
                 <span style={{ color: "black" }}>{m.message}</span>
               </div>
             );
           })}
       </div>
-      {typing && typing.userName && (
+      {typing && typing.userName && typing.typing && (
         <div
           style={{ position: "absolute", bottom: 60, right: 40, fontSize: 18 }}
         >
