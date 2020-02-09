@@ -16,7 +16,10 @@ const Login = (props: any) => {
     props.send(
       JSON.stringify({
         action: "REQUEST_LOGIN",
-        client: { clientId: props.user.clientId, userName: value }
+        client: {
+          clientId: props.user.clientId,
+          userName: value
+        }
       })
     );
     setValue("");
