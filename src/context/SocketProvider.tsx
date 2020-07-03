@@ -1,11 +1,13 @@
 import React, { useEffect, useState, createContext } from "react";
 
-const s = new WebSocket("wss:quiet-mesa-83538.herokuapp.com/ws");
-
 export const { Provider, Consumer } = createContext<any>({});
 
+const initWS = () => {
+  return new WebSocket("ws://localhost:8080/ws");
+};
+const ws = initWS();
 const SocketProvider: React.FC = ({ children }) => {
-  const [socket] = useState(s);
+  const [socket, setSocket] = useState(ws);
   const [response, setResponse] = useState({});
 
   const send = (args: any) => {
@@ -15,14 +17,14 @@ const SocketProvider: React.FC = ({ children }) => {
   useEffect(() => {
     socket.onopen = (e: any) => {
       console.log("Successfully Connected");
-
       send(
         JSON.stringify({
-          action: "REQUEST_VERSION_NUMBER"
+          action: "REQUEST_VERSION_NUMBER",
         })
       );
       socket.onclose = (e: any) => {
         console.log("Socket Closed Connection: ", e);
+        setSocket(initWS());
       };
       socket.onmessage = (e: any) => {
         setResponse(JSON.parse(e.data));

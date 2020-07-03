@@ -19,7 +19,20 @@ const Login = (props: any) => {
         client: {
           clientId: props.user.clientId,
           userName: value
-        }
+            ? value
+            : (function makeid(length: number) {
+                var result = "";
+                var characters =
+                  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                var charactersLength = characters.length;
+                for (var i = 0; i < length; i++) {
+                  result += characters.charAt(
+                    Math.floor(Math.random() * charactersLength)
+                  );
+                }
+                return result;
+              })(10),
+        },
       })
     );
     setValue("");
@@ -27,7 +40,11 @@ const Login = (props: any) => {
 
   useEffect(() => {
     if (props.response) {
-      if (props.response.userName) {
+      if (
+        props.response.userName &&
+        props.response.clientId !== "00000000-0000-0000-0000-000000000000"
+      ) {
+        console.log(props.response);
         props.setUser({ ...props.user, userName: props.response.userName });
         props.setLoggedIn(true);
       }
@@ -39,7 +56,7 @@ const Login = (props: any) => {
       style={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center"
+        justifyContent: "center",
       }}
     >
       <h3>Choose a username</h3>
@@ -53,7 +70,7 @@ const Login = (props: any) => {
             borderWidth: 0,
             fontSize: 20,
             height: 40,
-            marginBottom: "calc(100% - 30px)"
+            marginBottom: "calc(100% - 30px)",
           }}
         />
       </form>

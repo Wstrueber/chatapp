@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { withSocket } from "../../context/withSocket";
 import { withUser } from "../../context/withUser";
-import { useRef } from "react";
-
+import "./styles.css";
 const Chat = (props: any) => {
   const [messages, setMessages] = useState<any[]>([]);
   const [typing, setTyping] = useState<any>(null);
   const [value, setValue] = useState("");
-  const [color] = useState(
-    "#" + (((1 << 24) * Math.random()) | 0).toString(16)
-  );
 
   const handleTyping = (payload: any) => {
     setTyping({
       typing: payload.typing,
-      userName: payload.userName
+      userName: payload.userName,
+      color: payload.color,
     });
   };
+
+  console.log(props.response.Clients);
 
   useEffect(() => {
     if (props.response) {
@@ -25,11 +24,14 @@ const Chat = (props: any) => {
       if (payload && payload.message) {
         console.log(payload);
         setMessages([
+          {
+            userName: payload.userName,
+            color: payload.color,
+            message: payload.message,
+          },
           ...messages,
-          { userName: payload.userName, message: payload.message }
         ]);
       }
-      console.log(payload.typing, "<---");
       if (payload && payload.userName) {
         handleTyping(payload);
       }
@@ -37,7 +39,10 @@ const Chat = (props: any) => {
   }, [props.response]);
 
   useEffect(() => {
-    console.log(messages);
+    const container = document.getElementById("container");
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -47,9 +52,9 @@ const Chat = (props: any) => {
           action: "USER_TYPING",
           client: {
             clientId: props.user.clientId,
-            userName: props.user.userName
+            userName: props.user.userName,
           },
-          typing: true
+          typing: true,
         })
       );
       return;
@@ -67,36 +72,55 @@ const Chat = (props: any) => {
         color: "black",
         fontWeight: "bolder",
         position: "relative",
-        backgroundColor: "lightblue"
+        backgroundColor: "lightblue",
       }}
     >
       <div
+        id="container"
         style={{
           height: "calc(100% - 42px)",
           overflow: "hidden",
-          overflowY: "auto"
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column-reverse",
         }}
       >
         {messages.length > 0 &&
           messages.map((m: any, i: number) => {
             return (
               <div
-                style={{ paddingLeft: 10, paddingTop: 2, fontSize: 20 }}
+                style={{
+                  paddingLeft: 10,
+                  paddingTop: 2,
+                  fontSize: 20,
+                }}
                 key={i}
               >
-                {m.userName && <span style={{ color }}>{m.userName}: </span>}
+                {m.userName && (
+                  <span style={{ color: m.color }}>{m.userName}: </span>
+                )}
                 <span style={{ color: "black" }}>{m.message}</span>
               </div>
             );
           })}
+        {props.response.Clients && props.response.Clients.length > 0 && (
+          <div style={{ position: "absolute", top: 0, right: 0 }}>
+            Clients:
+            {props.response.Clients.map((c) => (
+              <div>{c.userName}</div>
+            ))}
+          </div>
+        )}
       </div>
       {typing && typing.userName && typing.typing && (
         <div
           style={{ position: "absolute", bottom: 60, right: 40, fontSize: 18 }}
         >
-          <span style={{ color }}>{typing.userName}</span> is typing...
+          <span style={{ color: typing.color }}>{typing.userName}</span> is
+          typing...
         </div>
       )}
+
       <form
         onSubmit={(e: any) => {
           e.preventDefault();
@@ -106,8 +130,8 @@ const Chat = (props: any) => {
               message: value,
               client: {
                 clientId: props.user.clientId,
-                userName: props.user.userName
-              }
+                userName: props.user.userName,
+              },
             })
           );
           setTyping(null);
@@ -117,9 +141,9 @@ const Chat = (props: any) => {
               action: "USER_TYPING",
               client: {
                 clientId: props.user.clientId,
-                userName: props.user.userName
+                userName: props.user.userName,
               },
-              typing: false
+              typing: false,
             })
           );
         }}
@@ -137,7 +161,9 @@ const Chat = (props: any) => {
             fontSize: 16,
             height: 40,
             bottom: 0,
-            left: 0
+            left: 0,
+            padding: 0,
+            textIndent: 4,
           }}
         />
       </form>
